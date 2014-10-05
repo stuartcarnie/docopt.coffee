@@ -1,8 +1,5 @@
 print = -> console.log [].join.call arguments, ' '
 
-atos = Array.prototype.toString
-Array.prototype.toString = -> '[' + atos.call(@) + ']'
-
 class DocoptLanguageError extends Error
     constructor: (@message) ->
         print @message
@@ -428,7 +425,7 @@ parse_args = (source, options) ->
     return opts
 
 parse_doc_options = (doc) ->
-    (Option.parse('-' + s) for s in doc.split(/^ *-|\n *-/)[1..])
+    (Option.parse('-' + s) for s in doc.split(/^\s*-|\n\s*-/)[1..])
 
 printable_usage = (doc, name) ->
     usage_split = doc.split(/(usage:)/i)
