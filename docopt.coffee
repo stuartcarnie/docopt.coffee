@@ -131,7 +131,10 @@ class Argument extends Pattern
     match: (left, collected=[]) ->
         args = (l for l in left when l.constructor is Argument)
         if not args.length then return [false, left, collected]
-        left = (l for l in left when l.toString() isnt args[0].toString())
+
+        idx = left.indexOf args[0]
+        left = left.slice(0, idx).concat(left.slice(idx + 1))
+
         if @value is null or @value.constructor isnt Array
             collected = collected.concat [new Argument @name(), args[0].value]
             return [true, left, collected]
