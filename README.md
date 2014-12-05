@@ -43,15 +43,17 @@ API `{docopt} = require 'docopt'`
 * `doc` (required) should be a string with the help message, written according 
 to rules of the [docopt language](http://docopt.org). Here's a quick example:
 
-    Usage: your_program [options]
+  ```bash
+  Usage: your_program [options]
 
     -h --help     Show this.
     -v --verbose  Print more text.
     --quiet       Print less text.
     -o FILE       Specify output file [default: ./test.txt].
+  ```
 
-* `argv` is an optional argument vector. It defaults to the arguments passed 
-* to your program (`process.argv[2..]`). You can also supply it with an array
+* `argv` is an optional argument vector. It defaults to the arguments passed
+to your program (`process.argv[2..]`). You can also supply it with an array
 of strings, as with `process.argv`. For example: `['--verbose', '-o', 'hai.txt']`.
 
 * `help` (default:`true`) specifies whether the parser should automatically
