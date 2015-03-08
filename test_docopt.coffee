@@ -1020,6 +1020,44 @@ test "option_arguments_default_to_none", ->
     )
 
 
+test "options_first", ->
+    d = "usage: prog [--opt] [<args>...]"
+
+    eq(
+        docopt(
+            d
+            argv: '--opt this that'
+        )
+        new Dict [
+            ['--opt', true],
+            ['<args>', ['this', 'that']]
+        ]
+    )
+
+    eq(
+        docopt(
+            d
+            argv: 'this that --opt'
+        )
+        new Dict [
+            ['--opt', true],
+            ['<args>', ['this', 'that']]
+        ]
+    )
+
+    eq(
+        docopt(
+            d
+            argv: 'this that --opt'
+            options_first: true
+        )
+        new Dict [
+            ['--opt', false],
+            ['<args>', ['this', 'that', '--opt']]
+        ]
+    )
+
+
 test "options_without_description", ->
     eq(docopt('usage: prog --hello', argv: '--hello'),
        new Dict([['--hello', true]]))

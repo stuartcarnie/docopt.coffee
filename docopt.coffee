@@ -429,7 +429,7 @@ parse_atom = (tokens, options) ->
         [new Command tokens.shift()]
 
 
-parse_args = (source, options) ->
+parse_args = (source, options, options_first) ->
     tokens = new TokenStream source, DocoptExit
     #options = options.slice(0) # shallow copy, not sure if necessary
     opts = []
@@ -443,6 +443,8 @@ parse_args = (source, options) ->
         else if token[0] is '-' and token isnt '-'
             shorts = parse_shorts tokens, options
             opts = opts.concat shorts
+        else if options_first
+            return opts.concat(new Argument null, tokens.shift() while tokens.length)
         else
             opts.push new Argument null, tokens.shift()
     return opts
@@ -483,7 +485,7 @@ class Dict extends Object
         '{' + (k + ': ' + @[k] for k in atts).join(',\n ') + '}'
 
 docopt = (doc, kwargs={}) ->
-    allowedargs = ['argv', 'name', 'help', 'version']
+    allowedargs = ['argv', 'name', 'help', 'version', 'options_first']
     throw new Error "unrecognized argument to docopt: " for arg of kwargs \
         when arg not in allowedargs
 
@@ -495,12 +497,14 @@ docopt = (doc, kwargs={}) ->
               then true else kwargs.help
     version = if kwargs.version is undefined \
               then null else kwargs.version
+    options_first = if kwargs.options_first is undefined \
+              then false else kwargs.options_first
 
     usage = printable_usage doc, name
     pot_options = parse_doc_options doc
     formal_pattern   = parse_pattern formal_usage(usage), pot_options
 
-    argv = parse_args argv, pot_options
+    argv = parse_args argv, pot_options, options_first
     extras help, version, argv, doc
     [matched, left, argums] = formal_pattern.fix().match argv
     if matched and left.length is 0  # better message if left?
