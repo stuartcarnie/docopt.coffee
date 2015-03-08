@@ -36,7 +36,7 @@ pass to the `docopt` function.
 API `{docopt} = require 'docopt'`
 ---------------------------------
 
-### `options = docopt(doc, {argv: process.argv[2..], help: true, version: null})`
+### `options = docopt(doc, {argv: process.argv[2..], help: true, version: null, options_first: false})`
 
 `docopt` takes 1 required argument, and 3 optional keyword arguments:
 
@@ -68,8 +68,15 @@ version of your program. If supplied, then, if the parser encounters
 `version` could be any printable object, but most likely a string,
 e.g. `'2.1.0rc1'`.
 
-**Note:** Although `docopt` automatically handles `-h`, `--help` and `--version` options, 
-you still need to mention them in the options description (`doc`) for your users to 
+* `options_first`, by default `False`.  If set to `True` will
+disallow mixing options and positional argument.  I.e. after first
+positional argument, all arguments will be interpreted as positional
+even if the look like options.  This can be used for strict
+compatibility with POSIX, or if you want to dispatch your arguments
+to other programs.
+
+**Note:** Although `docopt` automatically handles `-h`, `--help` and `--version` options,
+you still need to mention them in the options description (`doc`) for your users to
 know about them.
 
 The **return** value is an `Object` with properties (giving long options precedence), 

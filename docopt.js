@@ -786,7 +786,7 @@
     }
   };
 
-  parse_args = function(source, options) {
+  parse_args = function(source, options, options_first) {
     var long, opts, shorts, token, tokens;
     tokens = new TokenStream(source, DocoptExit);
     opts = [];
@@ -806,6 +806,15 @@
       } else if (token[0] === '-' && token !== '-') {
         shorts = parse_shorts(tokens, options);
         opts = opts.concat(shorts);
+      } else if (options_first) {
+        return opts.concat((function() {
+          var results;
+          results = [];
+          while (tokens.length) {
+            results.push(new Argument(null, tokens.shift()));
+          }
+          return results;
+        })());
       } else {
         opts.push(new Argument(null, tokens.shift()));
       }
@@ -909,11 +918,11 @@
   })(Object);
 
   docopt = function(doc, kwargs) {
-    var a, allowedargs, arg, argums, argv, formal_pattern, help, left, matched, name, opt, options, parameters, pot_arguments, pot_options, ref, usage, version;
+    var a, allowedargs, arg, argums, argv, formal_pattern, help, left, matched, name, opt, options, options_first, parameters, pot_arguments, pot_options, ref, usage, version;
     if (kwargs == null) {
       kwargs = {};
     }
-    allowedargs = ['argv', 'name', 'help', 'version'];
+    allowedargs = ['argv', 'name', 'help', 'version', 'options_first'];
     for (arg in kwargs) {
       if (indexOf.call(allowedargs, arg) < 0) {
         throw new Error("unrecognized argument to docopt: ");
@@ -923,10 +932,11 @@
     name = kwargs.name === void 0 ? null : kwargs.name;
     help = kwargs.help === void 0 ? true : kwargs.help;
     version = kwargs.version === void 0 ? null : kwargs.version;
+    options_first = kwargs.options_first === void 0 ? false : kwargs.options_first;
     usage = printable_usage(doc, name);
     pot_options = parse_doc_options(doc);
     formal_pattern = parse_pattern(formal_usage(usage), pot_options);
-    argv = parse_args(argv, pot_options);
+    argv = parse_args(argv, pot_options, options_first);
     extras(help, version, argv, doc);
     ref = formal_pattern.fix().match(argv), matched = ref[0], left = ref[1], argums = ref[2];
     if (matched && left.length === 0) {
