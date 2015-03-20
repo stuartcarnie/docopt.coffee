@@ -1,28 +1,51 @@
 {
-    "name": "docopt",
-    "version": "0.6.0",
-    "author": "Vladimir Keleshev <vladimir@keleshev.com>",
-    "contributors": [
-        {
-            "name": "Andrew Kassen",
-            "email": "atkassen@berkeley.edu"
-        },
-        {
-            "name": "Vladimir Keleshev",
-            "email": "vladimir@keleshev.com"
-        },
-        {
-            "name": "Stuart Carnie",
-            "email": "stuart.carnie@gmail.com"
-        }
-    ],
-    "description": "a command line option parser that will make you smile",
-    "main": "docopt.js",
-    "engines": { "node" : ">=0.8.0" },
-    "keywords": [ "command", "options", "argument", "args", "cli", "commandline" ],
-    "licenses": "MIT",
-    "repository" : {
-        "type": "git",
-        "url": "git://github.com/scarnie/docopt.coffee.git"
+  "name": "docopt",
+  "version": "0.6.0",
+  "author": "Vladimir Keleshev <vladimir@keleshev.com>",
+  "contributors": [
+    {
+      "name": "Andrew Kassen",
+      "email": "atkassen@berkeley.edu"
+    },
+    {
+      "name": "Vladimir Keleshev",
+      "email": "vladimir@keleshev.com"
+    },
+    {
+      "name": "Stuart Carnie",
+      "email": "stuart.carnie@gmail.com"
+    },
+    {
+      "name": "Matthias Rolke",
+      "email": "mr.amtrack@gmail.com"
     }
+  ],
+  "description": "a command line option parser that will make you smile",
+  "main": "docopt.js",
+  "scripts": {
+    "test": "coffee test_docopt.coffee",
+    "test_cases": "./language_agnostic_tests/language_agnostic_tester.py ./language_agnostic_tests/testee.coffee",
+    "lint": "coffeelint docopt.coffee",
+    "prepublish": "coffee -c docopt.coffee"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "keywords": [
+    "command",
+    "options",
+    "argument",
+    "args",
+    "cli",
+    "commandline"
+  ],
+  "licenses": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/scarnie/docopt.coffee.git"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.9.1",
+    "coffeelint": "^1.9.2"
+  }
 }
