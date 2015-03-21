@@ -6,5 +6,5 @@ node_js:
   - "0.10"
 script:
   - npm run test
-# - npm run test_cases
+  - npm run test_cases
 # - npm run lint
