@@ -1,4 +1,4 @@
-`docopt` – a command line option parser that will make you smile
+`docopt` – a command line option parser that will make you smile [![Build Status](https://travis-ci.org/stuartcarnie/docopt.coffee.svg)](https://travis-ci.org/stuartcarnie/docopt.coffee)
 ===============================================================
 
 > [docopt](http://docopt.org) is a language for description of command-line
