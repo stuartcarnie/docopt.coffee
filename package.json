@@ -23,9 +23,8 @@
   "description": "a command line option parser that will make you smile",
   "main": "docopt.js",
   "scripts": {
-    "test": "coffee test_docopt.coffee",
-    "test_cases": "./language_agnostic_tests/language_agnostic_tester.py ./language_agnostic_tests/testee.coffee",
-    "lint": "coffeelint docopt.coffee",
+    "test": "mocha --compilers coffee:coffee-script/register",
+    "lint": "coffeelint docopt.coffee test/*.coffee",
     "prepublish": "coffee -c docopt.coffee"
   },
   "engines": {
@@ -45,7 +44,9 @@
     "url": "git://github.com/scarnie/docopt.coffee.git"
   },
   "devDependencies": {
+    "chai": "^2.2.0",
     "coffee-script": "^1.9.1",
-    "coffeelint": "^1.9.2"
+    "coffeelint": "^1.9.2",
+    "mocha": "^2.2.1"
   }
 }
