@@ -38,7 +38,7 @@
     "cli",
     "commandline"
   ],
-  "licenses": "MIT",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/scarnie/docopt.coffee.git"
