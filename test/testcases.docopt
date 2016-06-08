@@ -938,6 +938,20 @@ NOT PART OF SECTION"""
 $ prog --foo
 {"--foo": true, "--bar": false}
 
+r"""Usage:
+ prog [<data>] [-- <args>...]
+ prog --bar
+NOT PART OF SECTION"""
+$ prog -- bare old
+{"<data>": null, "--": true, "<args>": ["bare", "old"], "--bar": false}
+
+r"""Usage:
+ prog [<data>] [-- <args>...]
+ prog --bar
+NOT PART OF SECTION"""
+$ prog value -- foo bar
+{"<data>": "value", "--": true, "<args>": ["foo", "bar"], "--bar": false}
+
 #
 # Options-section syntax
 #

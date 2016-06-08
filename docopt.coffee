@@ -178,6 +178,8 @@ class Argument extends LeafPattern
 
     singleMatch: (left) ->
         for [n, pattern] in enumerate(left)
+            if pattern.value is '--'
+                return [null, null]
             if pattern.constructor is Argument
                 return [n, new Argument(@name, pattern.value)]
         return [null, null]
