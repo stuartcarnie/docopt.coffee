@@ -45,8 +45,8 @@ endsWith =
 _split = (string) ->
     string.trim().split(/\s+/).filter (i) -> i != ''
 
-String::isUpper = ->
-    /^[A-Z]+$/g.exec(this)
+isUpper = (string) ->
+    /^[A-Z]+$/g.exec(string)
 
 Number.isInteger = Number.isInteger || (value) ->
     return typeof value == "number" &&
@@ -458,7 +458,7 @@ parse_atom = (tokens, options) ->
         return parse_long tokens, options
     else if startsWith(token, '-') and token not in ['-', '--']
         return parse_shorts(tokens, options)
-    else if startsWith(token, '<') and endsWith(token, '>') or token.isUpper()
+    else if startsWith(token, '<') and endsWith(token, '>') or isUpper(token)
         return [new Argument(tokens.move())]
     else
         [new Command tokens.move()]
