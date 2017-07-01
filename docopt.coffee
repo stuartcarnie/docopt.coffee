@@ -13,33 +13,42 @@ zip = (args...) ->
     for i in [0...length]
         arr[i] for arr in args
 
-String::partition = (separator) ->
-    self = this
-    if self.indexOf(separator) >= 0
-        parts = self.split(separator)
+partition = (string, separator) ->
+    if string.indexOf(separator) >= 0
+        parts = string.split(separator)
         return [parts[0], separator, parts.slice(1).join(separator)]
     else
-        return [String(self), '', '']
+        return [String(string), '', '']
 
-String::startsWith = (searchString, position) ->
-    position = position || 0
-    return this.lastIndexOf(searchString, position) == position
+startsWith =
+    if String.prototype.startsWith
+        (string, searchString, position) ->
+            return string.startsWith(searchString, position)
+    else
+        (string, searchString, position) ->
+            position = position || 0
+            return string.lastIndexOf(searchString, position) == position
 
-String::endsWith = (searchString, position) ->
-    subjectString = this.toString()
-    if (position == undefined || position > subjectString.length)
-        position = subjectString.length
-    position -= searchString.length
-    lastIndex = subjectString.indexOf(searchString, position)
-    return lastIndex != -1 && lastIndex == position
+endsWith =
+    if String.prototype.endsWith
+        (string, searchString, position) ->
+            return string.endsWith(searchString, position)
+    else
+        (string, searchString, position) ->
+            subjectString = string.toString()
+            if (position == undefined || position > subjectString.length)
+                position = subjectString.length
+            position -= searchString.length
+            lastIndex = subjectString.indexOf(searchString, position)
+            return lastIndex != -1 && lastIndex == position
 
-String::_split = ->
-    this.trim().split(/\s+/).filter (i) -> i != ''
+_split = (string) ->
+    string.trim().split(/\s+/).filter (i) -> i != ''
 
-String::isUpper = ->
-    /^[A-Z]+$/g.exec(this)
+isUpper = (string) ->
+    /^[A-Z]+$/g.exec(string)
 
-Number.isInteger = Number.isInteger || (value) ->
+isInteger = Number.isInteger || (value) ->
     return typeof value == "number" &&
            isFinite(value) &&
            Math.floor(value) == value
@@ -88,7 +97,7 @@ class Pattern extends Object
                     if e.value is null
                         e.value = []
                     else if e.value.constructor isnt Array
-                        e.value = e.value._split()
+                        e.value = _split(e.value)
                 if e.constructor is Command or e.constructor is Option and e.argcount == 0
                     e.value = 0
         @
@@ -144,15 +153,15 @@ class LeafPattern extends Pattern
             return [false, left, collected]
         left_ = left.slice(0, pos).concat(left.slice(pos + 1))
         same_name = (a for a in collected when a.name == @.name)
-        if Number.isInteger(@value) or @value instanceof Array
-            if Number.isInteger(@value)
+        if isInteger(@value) or @value instanceof Array
+            if isInteger(@value)
                 increment = 1
             else
                 increment = if typeof match.value == 'string' then [match.value] else match.value
             if not same_name.length
                 match.value = increment
                 return [true, left_, collected.concat(match)]
-            if Number.isInteger(@value)
+            if isInteger(@value)
                 same_name[0].value += increment
             else
                 same_name[0].value = [].concat(same_name[0].value, increment)
@@ -214,12 +223,12 @@ class Option extends LeafPattern
 
     @parse: (option_description) ->
         [short, long, argcount, value] = [null, null, 0, false]
-        [options, _, description] = option_description.trim().partition('  ')
+        [options, _, description] = partition(option_description.trim(), '  ')
         options = options.replace /,|=/g, ' '
-        for s in options._split()  # split on spaces
-            if s.startsWith('--')
+        for s in _split(options)  # split on spaces
+            if startsWith(s, '--')
                 long = s
-            else if s.startsWith('-')
+            else if startsWith(s, '-')
                 short = s
             else
                 argcount = 1
@@ -306,7 +315,7 @@ class Either extends BranchPattern
 class Tokens extends Array
 
     constructor: (source, @error=DocoptExit) ->
-        stream = if source.constructor is String then source._split() else source
+        stream = if source.constructor is String then _split(source) else source
         @push.apply @, stream
 
     move: -> if @.length then [].shift.apply(@) else null
@@ -329,7 +338,7 @@ parse_section = (name, source) ->
 parse_shorts = (tokens, options) ->
     """shorts ::= '-' ( chars )* [ [ ' ' ] chars ] ;"""
     token = tokens.move()
-    console.assert token.startsWith('-') and not token.startsWith('--')
+    console.assert startsWith(token, '-') and not startsWith(token, '--')
     left = token.replace(/^-+/g, '')
     parsed = []
     while left != ''
@@ -361,12 +370,12 @@ parse_shorts = (tokens, options) ->
 
 parse_long = (tokens, options) ->
     """long ::= '--' chars [ ( ' ' | '=' ) chars ] ;"""
-    [long, eq, value] = tokens.move().partition('=')
-    console.assert long.startsWith('--')
+    [long, eq, value] = partition(tokens.move(), '=')
+    console.assert startsWith(long, '--')
     value = null if (eq == value and value == '')
     similar = (o for o in options when o.long == long)
     if tokens.error is DocoptExit and similar.length == 0  # if no exact match
-        similar = (o for o in options when o.long and o.long.startsWith(long))
+        similar = (o for o in options when o.long and startsWith(o.long, long))
     if similar.length > 1  # might be simply specified ambiguously 2+ times?
         longs = (o.long for o in similar).join(', ')
         throw new tokens.error("#{long} is not a unique prefix: #{longs}?")
@@ -445,11 +454,11 @@ parse_atom = (tokens, options) ->
     else if token is 'options'
         tokens.move()
         return [new OptionsShortcut]
-    else if token.startsWith('--') and token != '--'
+    else if startsWith(token, '--') and token != '--'
         return parse_long tokens, options
-    else if token.startsWith('-') and token not in ['-', '--']
+    else if startsWith(token, '-') and token not in ['-', '--']
         return parse_shorts(tokens, options)
-    else if token.startsWith('<') and token.endsWith('>') or token.isUpper()
+    else if startsWith(token, '<') and endsWith(token, '>') or isUpper(token)
         return [new Argument(tokens.move())]
     else
         [new Command tokens.move()]
@@ -466,9 +475,9 @@ parse_argv = (tokens, options, options_first=false) ->
     while tokens.current() isnt null
         if tokens.current() == '--'
             return parsed.concat(new Argument(null, v) for v in tokens)
-        else if tokens.current().startsWith('--')
+        else if startsWith(tokens.current(), '--')
             parsed = parsed.concat(parse_long(tokens, options))
-        else if tokens.current().startsWith('-') and tokens.current() != '-'
+        else if startsWith(tokens.current(), '-') and tokens.current() != '-'
             parsed = parsed.concat(parse_shorts(tokens, options))
         else if options_first
             return parsed.concat(new Argument(null, v) for v in tokens)
@@ -480,18 +489,18 @@ parse_defaults = (doc) ->
     defaults = []
     for s in parse_section('options:', doc)
         # FIXME corner case "bla: options: --foo"
-        [_, _, s] = s.partition(':')  # get rid of "options:"
+        [_, _, s] = partition(s, ':')  # get rid of "options:"
         split = ('\n' + s).split(new RegExp('\\n[ \\t]*(-\\S+?)')).slice(1)
         odd  = (v for v in split by 2)
         even = (v for v in split[1..] by 2)
         split = (s1 + s2 for [s1, s2] in zip(odd, even))
-        options = (Option.parse(s) for s in split when s.startsWith('-'))
+        options = (Option.parse(s) for s in split when startsWith(s, '-'))
         defaults.push.apply(defaults, options)
     return defaults
 
 formal_usage = (section) ->
-    [_, _, section] = section.partition ':' # drop "usage:"
-    pu = section._split()
+    [_, _, section] = partition(section, ':') # drop "usage:"
+    pu = _split(section)
     return '( ' + ((if s == pu[0] then ') | (' else s) for s in pu[1..]).join(' ') + ' )'
 
 extras = (help, version, options, doc) ->
