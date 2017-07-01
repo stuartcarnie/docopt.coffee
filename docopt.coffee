@@ -29,13 +29,18 @@ startsWith =
             position = position || 0
             return string.lastIndexOf(searchString, position) == position
 
-String::endsWith = (searchString, position) ->
-    subjectString = this.toString()
-    if (position == undefined || position > subjectString.length)
-        position = subjectString.length
-    position -= searchString.length
-    lastIndex = subjectString.indexOf(searchString, position)
-    return lastIndex != -1 && lastIndex == position
+endsWith =
+    if String.prototype.endsWith
+        (string, searchString, position) ->
+            return string.endsWith(searchString, position)
+    else
+        (string, searchString, position) ->
+            subjectString = string.toString()
+            if (position == undefined || position > subjectString.length)
+                position = subjectString.length
+            position -= searchString.length
+            lastIndex = subjectString.indexOf(searchString, position)
+            return lastIndex != -1 && lastIndex == position
 
 String::_split = ->
     this.trim().split(/\s+/).filter (i) -> i != ''
@@ -453,7 +458,7 @@ parse_atom = (tokens, options) ->
         return parse_long tokens, options
     else if startsWith(token, '-') and token not in ['-', '--']
         return parse_shorts(tokens, options)
-    else if startsWith(token, '<') and token.endsWith('>') or token.isUpper()
+    else if startsWith(token, '<') and endsWith(token, '>') or token.isUpper()
         return [new Argument(tokens.move())]
     else
         [new Command tokens.move()]
