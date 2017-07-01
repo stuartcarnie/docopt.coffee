@@ -48,7 +48,7 @@ _split = (string) ->
 isUpper = (string) ->
     /^[A-Z]+$/g.exec(string)
 
-Number.isInteger = Number.isInteger || (value) ->
+isInteger = Number.isInteger || (value) ->
     return typeof value == "number" &&
            isFinite(value) &&
            Math.floor(value) == value
@@ -153,15 +153,15 @@ class LeafPattern extends Pattern
             return [false, left, collected]
         left_ = left.slice(0, pos).concat(left.slice(pos + 1))
         same_name = (a for a in collected when a.name == @.name)
-        if Number.isInteger(@value) or @value instanceof Array
-            if Number.isInteger(@value)
+        if isInteger(@value) or @value instanceof Array
+            if isInteger(@value)
                 increment = 1
             else
                 increment = if typeof match.value == 'string' then [match.value] else match.value
             if not same_name.length
                 match.value = increment
                 return [true, left_, collected.concat(match)]
-            if Number.isInteger(@value)
+            if isInteger(@value)
                 same_name[0].value += increment
             else
                 same_name[0].value = [].concat(same_name[0].value, increment)
