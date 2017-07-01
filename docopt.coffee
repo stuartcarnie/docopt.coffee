@@ -42,8 +42,8 @@ endsWith =
             lastIndex = subjectString.indexOf(searchString, position)
             return lastIndex != -1 && lastIndex == position
 
-String::_split = ->
-    this.trim().split(/\s+/).filter (i) -> i != ''
+_split = (string) ->
+    string.trim().split(/\s+/).filter (i) -> i != ''
 
 String::isUpper = ->
     /^[A-Z]+$/g.exec(this)
@@ -97,7 +97,7 @@ class Pattern extends Object
                     if e.value is null
                         e.value = []
                     else if e.value.constructor isnt Array
-                        e.value = e.value._split()
+                        e.value = _split(e.value)
                 if e.constructor is Command or e.constructor is Option and e.argcount == 0
                     e.value = 0
         @
@@ -225,7 +225,7 @@ class Option extends LeafPattern
         [short, long, argcount, value] = [null, null, 0, false]
         [options, _, description] = partition(option_description.trim(), '  ')
         options = options.replace /,|=/g, ' '
-        for s in options._split()  # split on spaces
+        for s in _split(options)  # split on spaces
             if startsWith(s, '--')
                 long = s
             else if startsWith(s, '-')
@@ -315,7 +315,7 @@ class Either extends BranchPattern
 class Tokens extends Array
 
     constructor: (source, @error=DocoptExit) ->
-        stream = if source.constructor is String then source._split() else source
+        stream = if source.constructor is String then _split(source) else source
         @push.apply @, stream
 
     move: -> if @.length then [].shift.apply(@) else null
@@ -500,7 +500,7 @@ parse_defaults = (doc) ->
 
 formal_usage = (section) ->
     [_, _, section] = partition(section, ':') # drop "usage:"
-    pu = section._split()
+    pu = _split(section)
     return '( ' + ((if s == pu[0] then ') | (' else s) for s in pu[1..]).join(' ') + ' )'
 
 extras = (help, version, options, doc) ->
