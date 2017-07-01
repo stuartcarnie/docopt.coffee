@@ -13,13 +13,12 @@ zip = (args...) ->
     for i in [0...length]
         arr[i] for arr in args
 
-String::partition = (separator) ->
-    self = this
-    if self.indexOf(separator) >= 0
-        parts = self.split(separator)
+partition = (string, separator) ->
+    if string.indexOf(separator) >= 0
+        parts = string.split(separator)
         return [parts[0], separator, parts.slice(1).join(separator)]
     else
-        return [String(self), '', '']
+        return [String(string), '', '']
 
 String::startsWith = (searchString, position) ->
     position = position || 0
@@ -214,7 +213,7 @@ class Option extends LeafPattern
 
     @parse: (option_description) ->
         [short, long, argcount, value] = [null, null, 0, false]
-        [options, _, description] = option_description.trim().partition('  ')
+        [options, _, description] = partition(option_description.trim(), '  ')
         options = options.replace /,|=/g, ' '
         for s in options._split()  # split on spaces
             if s.startsWith('--')
@@ -361,7 +360,7 @@ parse_shorts = (tokens, options) ->
 
 parse_long = (tokens, options) ->
     """long ::= '--' chars [ ( ' ' | '=' ) chars ] ;"""
-    [long, eq, value] = tokens.move().partition('=')
+    [long, eq, value] = partition(tokens.move(), '=')
     console.assert long.startsWith('--')
     value = null if (eq == value and value == '')
     similar = (o for o in options when o.long == long)
@@ -480,7 +479,7 @@ parse_defaults = (doc) ->
     defaults = []
     for s in parse_section('options:', doc)
         # FIXME corner case "bla: options: --foo"
-        [_, _, s] = s.partition(':')  # get rid of "options:"
+        [_, _, s] = partition(s, ':')  # get rid of "options:"
         split = ('\n' + s).split(new RegExp('\\n[ \\t]*(-\\S+?)')).slice(1)
         odd  = (v for v in split by 2)
         even = (v for v in split[1..] by 2)
@@ -490,7 +489,7 @@ parse_defaults = (doc) ->
     return defaults
 
 formal_usage = (section) ->
-    [_, _, section] = section.partition ':' # drop "usage:"
+    [_, _, section] = partition(section, ':') # drop "usage:"
     pu = section._split()
     return '( ' + ((if s == pu[0] then ') | (' else s) for s in pu[1..]).join(' ') + ' )'
 
