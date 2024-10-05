@@ -41,7 +41,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/scarnie/docopt.coffee.git"
+    "url": "git://github.com/stuartcarnie/docopt.coffee.git"
   },
   "devDependencies": {
     "chai": "^2.2.0",
